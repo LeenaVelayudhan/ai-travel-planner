@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect,useState } from "react";
 import { Button } from "@/components/ui/button";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
+import { Input } from "@/components/ui/input"
+import { SelectBudgetOptions,SelectTravelList } from "@/constants/options"
 
 function CreateTrip() {
   const [place, setPlace] = useState(null);
@@ -11,29 +13,25 @@ function CreateTrip() {
   });
   const [loading, setLoading] = useState(false);
 
-  const SelectBudgetOptions = [
-    { title: "Economy", icon: "💸", desc: "Budget-friendly and economical options." },
-    { title: "Standard", icon: "💰", desc: "Balanced budget for comfort and quality." },
-    { title: "Luxury", icon: "💎", desc: "Premium and luxurious options." },
-  ];
 
-  const SelectTravelList = [
-    { title: "Solo", icon: "🧍", desc: "Traveling alone.", people: "Solo" },
-    { title: "Couple", icon: "👫", desc: "Traveling with a partner.", people: "Couple" },
-    { title: "Family", icon: "👨‍👩‍👧‍👦", desc: "Traveling with family.", people: "Family" },
-  ];
+  const handleInputChange=(name,value)=>{
+    setFormData({
+      ...formData,
+      [name]:value
+    })
+  }
+  useEffect(()=>{ 
+    console.log(formData)
+  },[formData])
 
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
 
   const OnGenerateTrip = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log("Trip generated with data:", formData);
-    }, 2000);
-  };
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //     setLoading(false);
+       console.log( formData);
+  //   }, 2000);
+   };
 
   return (
     <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen p-6">
