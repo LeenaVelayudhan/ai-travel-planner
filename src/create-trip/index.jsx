@@ -47,7 +47,11 @@ function CreateTrip() {
 
     const result=await chatSession.sendMessage(FINAL_PROMPT);
     console.log("--",result?.response?.text());
+<<<<<<< HEAD
     // setLoading(false);
+=======
+    setLoading(false);
+>>>>>>> ac604cbcafad86dd94752f5350f4cdecad588bb1
     // SaveAiTrip(result?.response?.text());
   }
 
