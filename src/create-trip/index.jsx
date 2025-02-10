@@ -1,10 +1,21 @@
-import React, { useEffect,useState } from "react";
-import { Button } from "@/components/ui/button";
-import GooglePlacesAutocomplete from "react-google-places-autocomplete";
-import { Input } from "@/components/ui/input"
+import React, { useEffect,useState } from "react"
+import { Button } from "@/components/ui/button"
+import GooglePlacesAutocomplete from "react-google-places-autocomplete"
+import { Input } from "@/components/ui/input";
 import { AI_PROMPT, SelectBudgetOptions,SelectTravelList } from "@/constants/options"
 import { toast } from "sonner"
 import { chatSession } from "@/service/AIModal"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from "@react-oauth/google"
+import axios from "axios"
 
 function CreateTrip() {
   const [place, setPlace] = useState(null);
@@ -14,7 +25,7 @@ function CreateTrip() {
     traveler: "",
   });
   const [loading, setLoading] = useState(false);
-
+  const [openDialog,setOpenDialog]=useState();
 
   const handleInputChange=(name,value)=>{
     setFormData({
@@ -25,14 +36,18 @@ function CreateTrip() {
   useEffect(()=>{ 
     console.log(formData)
   },[formData])
-
+  
+  const login=useGoogleLogin({
+    onSuccess:(codeResp)=>console.log(codeResp),
+    onError:(error)=>console.log(error)
+  })
 
   const OnGenerateTrip = async()=>{
-    // const user = localStorage.getItem('user')
-    // if(!user){
-    //   setOpenDialog(true)
-    //   return ;
-    // }
+    const user = localStorage.getItem('user')
+    if(!user){
+      setOpenDialog(true)
+      return ;
+    }
     if(!formData?.location || !formData?.budget || !formData?.traveler){
       toast("Please fill all details!")
       return ;
@@ -47,12 +62,20 @@ function CreateTrip() {
 
     const result=await chatSession.sendMessage(FINAL_PROMPT);
     console.log("--",result?.response?.text());
-<<<<<<< HEAD
     // setLoading(false);
-=======
-    setLoading(false);
->>>>>>> ac604cbcafad86dd94752f5350f4cdecad588bb1
     // SaveAiTrip(result?.response?.text());
+  }
+  const GetUserProfile=(tokenInfo)=>{
+      axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`, {
+      headers: {
+       Authorization: `Bearer ${tokenInfo?.access_token}`,
+       Accept:'Application/json'
+      }
+    }).then((resp) => {console.log(resp);
+      localStorage.setItem('user',JSON.stringify(resp.data));
+      setOpenDialog(false);
+      OnGenerateTrip();
+    })
   }
 
   return (
@@ -155,6 +178,23 @@ function CreateTrip() {
             {loading ? "Generating..." : "Generate Trip"}
           </Button>
         </div>
+        <Dialog open={openDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogDescription>
+              <img src="/logo.svg"/>
+              <h2 className="font-bold text-lg mt-6">Sign In with Google</h2>
+              <p>Sign In to the App with Google authentication securely</p>
+              <Button 
+              onClick={login} className="w-full mt-5 flex gap-4 items-center">
+                <FcGoogle className="h-7 w-7"/>
+                Sign In With Google
+              </Button>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
       </div>
     </div>
   );
