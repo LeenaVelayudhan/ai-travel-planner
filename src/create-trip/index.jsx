@@ -16,17 +16,20 @@ import {
 import { FcGoogle } from "react-icons/fc";
 import { useGoogleLogin } from "@react-oauth/google"
 import axios from "axios"
+import { doc, setDoc } from "firebase/firestore"; 
+import { db } from "@/service/firebaseConfig"
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 function CreateTrip() {
   const [place, setPlace] = useState(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState([{
     totalDays: "",
     budget: "",
     traveler: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [openDialog,setOpenDialog]=useState();
+  }]);
 
+  const [openDialog,setOpenDialog]=useState();
+  const [loading,setLoading]=useState(false);
   const handleInputChange=(name,value)=>{
     setFormData({
       ...formData,
@@ -62,9 +65,23 @@ function CreateTrip() {
 
     const result=await chatSession.sendMessage(FINAL_PROMPT);
     console.log("--",result?.response?.text());
-    // setLoading(false);
-    // SaveAiTrip(result?.response?.text());
+    setLoading(false);
+    SaveAiTrip(result?.response?.text());
   }
+  const SaveAiTrip=async(TripData) => {
+    setLoading(true);
+    const user=JSON.parse(localStorage.getItem("user"));
+    const docId=Date.now().toString();
+    // await setDoc(doc(db, "AiTrips", docId), {
+    //   userSelection:formData,
+    //   tripData:JSON.parse(TripData),
+    //   userEmail:user?.email,
+    //   id:docId
+    // });
+    setLoading(false);
+    // navigate('/view-trip/'+docId);
+  }
+
   const GetUserProfile=(tokenInfo)=>{
       axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`, {
       headers: {
@@ -77,7 +94,7 @@ function CreateTrip() {
       OnGenerateTrip();
     })
   }
-
+  
   return (
     <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen p-6">
       <div className="max-w-4xl mx-auto p-6 mt-12 bg-white shadow-2xl rounded-xl bg-opacity-80 backdrop-blur-sm">
@@ -175,9 +192,12 @@ function CreateTrip() {
             disabled={loading}
             className="bg-cyan-500 text-white px-6 py-3 rounded-lg hover:bg-cyan-600 focus:ring-2 focus:ring-cyan-300 transition duration-300"
           >
-            {loading ? "Generating..." : "Generate Trip"}
-          </Button>
+            {loading ? 
+             <AiOutlineLoading3Quarters className="h-7 w-7 animate-spin" />
+             : 'Generate Trip' }
+            </Button>
         </div>
+        
         <Dialog open={openDialog}>
         <DialogContent>
           <DialogHeader>
