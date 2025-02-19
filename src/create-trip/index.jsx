@@ -19,6 +19,7 @@ import axios from "axios"
 import { doc, setDoc } from "firebase/firestore"; 
 import { db } from "@/service/firebaseConfig"
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 function CreateTrip() {
   const [place, setPlace] = useState(null);
@@ -30,6 +31,7 @@ function CreateTrip() {
 
   const [openDialog,setOpenDialog]=useState();
   const [loading,setLoading]=useState(false);
+  const navigate=useNavigate();
   const handleInputChange=(name,value)=>{
     setFormData({
       ...formData,
@@ -68,19 +70,28 @@ function CreateTrip() {
     setLoading(false);
     SaveAiTrip(result?.response?.text());
   }
-  const SaveAiTrip=async(TripData) => {
-    setLoading(true);
-    const user=JSON.parse(localStorage.getItem("user"));
-    const docId=Date.now().toString();
-    // await setDoc(doc(db, "AiTrips", docId), {
-    //   userSelection:formData,
-    //   tripData:JSON.parse(TripData),
-    //   userEmail:user?.email,
-    //   id:docId
-    // });
-    setLoading(false);
-    // navigate('/view-trip/'+docId);
-  }
+  const SaveAiTrip = async (TripData) => {
+    try {
+      setLoading(true);
+      const user = JSON.parse(localStorage.getItem("user")) || {};
+      const docId = Date.now().toString();
+      
+      await setDoc(doc(db, "AITrips", docId), {
+        userSelection: formData, // Ensure formData exists
+        tripData: typeof TripData === "string" ? JSON.parse(TripData) : TripData,
+        userEmail: user?.email || "unknown",
+        id: docId
+      });
+  
+      setLoading(false);
+      navigate("/view-trip/" + docId);
+    } catch (error) {
+      console.error("Error saving trip:", error);
+      setLoading(false);
+      alert("Failed to save trip. Please try again.");
+    }
+  };
+  
 
   const GetUserProfile=(tokenInfo)=>{
       axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`, {
@@ -184,7 +195,7 @@ function CreateTrip() {
             </div>
           </div>
         </div>
-
+        </div>
         {/* Generate Trip Button */}
         <div className="mt-12 text-right">
           <Button
@@ -192,13 +203,13 @@ function CreateTrip() {
             disabled={loading}
             className="bg-cyan-500 text-white px-6 py-3 rounded-lg hover:bg-cyan-600 focus:ring-2 focus:ring-cyan-300 transition duration-300"
           >
-            {loading ? 
-             <AiOutlineLoading3Quarters className="h-7 w-7 animate-spin" />
-             : 'Generate Trip' }
-            </Button>
-        </div>
-        
-        <Dialog open={openDialog}>
+          {loading ? 
+          <AiOutlineLoading3Quarters className="h-7 w-7 animate-spin" />
+           : 'Generate Trip' }
+          </Button>
+      </div>
+
+      <Dialog open={openDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogDescription>
@@ -215,8 +226,10 @@ function CreateTrip() {
         </DialogContent>
       </Dialog>
 
-      </div>
     </div>
+
+  
+    
   );
 }
 
