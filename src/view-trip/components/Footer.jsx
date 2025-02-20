@@ -1,11 +1,11 @@
-import React from 'react'
+import React from 'react';
 
 function Footer() {
   return (
-    <div className='my-7'>
+    <footer className='my-7'>
         <h2 className='text-center text-gray-500'><b>AI Travel Planner</b></h2>
-    </div>
-  )
+    </footer>
+  );
 }
 
-export default Footer
+export default Footer;
