@@ -1,45 +1,25 @@
-import { Button } from '@/components/ui/button';
-import React, { useEffect, useState } from 'react';
-import { IoIosSend } from "react-icons/io";
-import { GetPlaceDetails, PHOTO_REF_URL } from '@/service/GlobalApi'
+import React from 'react';
+
 function InfoSection({ trip }) {
-
-    const [photoUrl, setPhotoUrl] = useState();
-
-    useEffect(() => {
-        trip && GetPlacePhoto();
-    }, [trip])
-
-    const GetPlacePhoto = async () => {
-        const data = {
-            textQuery: trip?.userSelection?.location
-        }
-        const result = await GetPlaceDetails(data).then(resp => {
-            console.log(resp.data.places[0].photos[3].name)
-            const PhotoUrl = PHOTO_REF_URL.replace('{NAME}', resp.data.places[0].photos[3].name)
-            setPhotoUrl(PhotoUrl)
-        })
-    }
-
     return (
-        <div className="p-5">
-            {/* Image */}
-            <img src={photoUrl?photoUrl:'/placeholder.jpg'} alt="img" className='h-[340px] w-full object-cover rounded-xl' />            <div className='flex justify-between items-center'>
-            {/* Location Title */}
-            <div className="mt-4">
-                <h2 className="text-black font-bold text-2xl">
-                    {trip?.userSelection?.location || "No Location Found"}
-                </h2>
-                
-                <div className='flex gap-6 mt-4'>
-                    <h2 className='bg-gray-200 font-medium text-gray-600 rounded-full p-1 px-4 md:text-md'>🗓️ {trip?.userSelection?.totalDays} Day</h2>
-                    <h2 className='bg-gray-200 font-medium text-gray-600 rounded-full p-1 px-4 md:text-md'>👩‍👧‍👦 Number of Traveler : {trip?.userSelection?.traveler} People</h2>
-                    <h2 className='bg-gray-200 font-medium text-gray-600 rounded-full p-1 px-4 md:text-md'>💵 {trip?.userSelection?.budget} Budget </h2>
+        <div className="relative w-full h-auto flex flex-col items-center"> 
+            {/* Full-Width Background Image */}
+            <div className="w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden rounded-3xl shadow-2xl">
+                <img 
+                    src='/placeholder.jpeg' 
+                    className='w-full h-full object-cover rounded-3xl' 
+                    alt="Destination" 
+                />
+            </div>
+            
+            {/* Travel Info Section */}
+            <div className='relative w-full max-w-5xl mt-[-50px] bg-gradient-to-r from-blue-500 to-teal-400 p-8 rounded-3xl shadow-lg text-center text-white z-10'>
+                <h2 className='font-extrabold text-4xl md:text-5xl'>{trip?.userSelection?.location}</h2>
+                <div className='flex flex-wrap justify-center gap-6 mt-4'>
+                    <span className='bg-white text-gray-800 font-semibold rounded-full px-6 py-3 shadow-md text-lg'>🗓️ {trip?.userSelection?.totalDays} Days</span>
+                    <span className='bg-white text-gray-800 font-semibold rounded-full px-6 py-3 shadow-md text-lg'>👩‍👧‍👦 {trip?.userSelection?.traveler} People</span>
+                    <span className='bg-white text-gray-800 font-semibold rounded-full px-6 py-3 shadow-md text-lg'>💵 {trip?.userSelection?.budget} Budget</span>
                 </div>
-                </div>
-                <Button>
-                    <IoIosSend/>
-                </Button>
             </div>
         </div>
     );
