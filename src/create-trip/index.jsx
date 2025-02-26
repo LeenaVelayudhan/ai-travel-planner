@@ -2,7 +2,9 @@ import React, { useEffect,useState } from "react";
 import { Button } from "@/components/ui/button";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { Input } from "@/components/ui/input"
-import { SelectBudgetOptions,SelectTravelList } from "@/constants/options"
+import { AI_PROMPT, SelectBudgetOptions,SelectTravelList } from "@/constants/options"
+import { toast } from "sonner"
+import { chatSession } from "@/service/AIModal"
 
 function CreateTrip() {
   const [place, setPlace] = useState(null);
@@ -25,13 +27,29 @@ function CreateTrip() {
   },[formData])
 
 
-  const OnGenerateTrip = () => {
-  //   setLoading(true);
-  //   setTimeout(() => {
-  //     setLoading(false);
-       console.log( formData);
-  //   }, 2000);
-   };
+  const OnGenerateTrip = async()=>{
+    // const user = localStorage.getItem('user')
+    // if(!user){
+    //   setOpenDialog(true)
+    //   return ;
+    // }
+    if(!formData?.location || !formData?.budget || !formData?.traveler){
+      toast("Please fill all details!")
+      return ;
+    }
+    toast("Form generated.");
+    setLoading(true);
+    const FINAL_PROMPT=AI_PROMPT
+    .replace('{location}',formData?.location)
+    .replace('{totalDays}',formData?.totalDays)
+    .replace('{traveler}',formData?.traveler)
+    .replace('{budget}',formData?.budget)
+
+    const result=await chatSession.sendMessage(FINAL_PROMPT);
+    console.log("--",result?.response?.text());
+    setLoading(false);
+    // SaveAiTrip(result?.response?.text());
+  }
 
   return (
     <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen p-6">
