@@ -2,58 +2,56 @@ import { GetPlaceDetails, PHOTO_REF_URL } from '@/service/GlobalApi';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-// Fallback image if no photo is available
-const defaultImage = '/public/road-trip-vacation.jpg';
 
-function HotelCardItem({ item }) {
-    const [photoUrl, setPhotoUrl] = useState(null);
+function HotelCardItem({ hotel }) {
+    const [photoUrl, setPhotoUrl] = useState('/placeholder.jpeg'); // Default to placeholder
 
     useEffect(() => {
-        if (item?.hotelName) {
-            GetPlaceImg();
+        if (hotel) {
+            GetPlacePhoto();
         }
-    }, [item?.hotelName]);
+    }, [hotel]);
 
-    const GetPlaceImg = async () => {
-        const data = {
-            textQuery: item?.hotelName
-        };
+    const GetPlacePhoto = async () => {
         try {
+            const data = { textQuery: hotel?.hotelName }; // Ensure correct property name
             const result = await GetPlaceDetails(data);
-            console.log('API Response:', result.data); // Debugging
-
-            // Check if the response contains photos
+            
             if (result?.data?.places?.[0]?.photos?.length > 0) {
-                const photoName = result.data.places[0].photos[0].name; // Use the first photo
-                setPhotoUrl(PHOTO_REF_URL.replace('{NAME}', photoName));
-            } else {
-                console.error('No photos found for this hotel');
-                setPhotoUrl(defaultImage); // Fallback to default image
+                const photoRef = result.data.places[0].photos[0].name; // Use first available photo
+                const PhotoUrl = PHOTO_REF_URL.replace('{NAME}', photoRef);
+                setPhotoUrl(PhotoUrl);
             }
         } catch (error) {
-            console.error('Error fetching place image:', error);
-            setPhotoUrl(defaultImage); // Fallback to default image
+            console.error("Failed to fetch hotel image:", error);
         }
     };
 
     return (
-        <div>
-            <Link to={`https://www.google.com/maps/search/?api=1&query=${item?.hotelName},${item?.hotelAddress}`} target='_blank'>
-                <div className='hover:scale-105 transition-all cursor-pointer'>
-                    <img
-                        src={photoUrl || defaultImage}
-                        className='rounded-xl h-[180px] w-full object-cover'
-                        alt={item?.hotelName || 'Hotel'}
-                    />
-                    <div className='my-3 py-2'>
-                        <h2 className='font-medium'>{item?.hotelName}</h2>
-                        <h2 className='text-xs text-gray-500'>📍{item?.hotelAddress}</h2>
-                        <h2 className='text-sm'>💰{item?.price}</h2>
-                        <h2 className='text-sm'>⭐{item?.rating}</h2>
-                    </div>
+        <Link
+            to={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                hotel?.hotelName + ", " + hotel?.hotelAddress
+            )}`}
+            target='_blank'
+        >
+            <div className='hover:scale-110 transition-all cursor-pointer mt-5 mb-8 border rounded-3xl p-6 shadow-xl bg-white hover:shadow-2xl'>
+                <img
+                    src={photoUrl}
+                    alt={hotel?.hotelName}
+                    onError={(e) => {
+                        console.error("Image failed to load:", e.target.src);
+                        e.target.src = "/placeholder.jpeg"; // Ensure fallback
+                    }}
+                    className='rounded-xl h-[180px] w-full object-cover'
+                />
+                <div className='my-2 text-center'>
+                    <h2 className='font-medium text-lg'>{hotel?.hotelName}</h2>
+                    <h2 className='text-xs text-gray-500'>📍 {hotel?.hotelAddress}</h2>
+                    <h2 className='text-sm font-semibold mt-1'>💰 ${hotel?.price} per night</h2>
+                    <h2 className='text-sm text-yellow-500 mt-1'>⭐ {hotel?.rating}</h2>
                 </div>
-            </Link>
-        </div>
+            </div>
+        </Link>
     );
 }
 
