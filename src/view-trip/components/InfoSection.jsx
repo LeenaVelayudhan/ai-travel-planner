@@ -24,8 +24,7 @@ function InfoSection({ trip }) {
                 const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location[0]}&appid=${apiKey}&units=metric`;
                 
                 // Fetch weather data
-                const weatherResp = await fetch(weatherUrl);
-                const weatherData = await weatherResp.json();
+
     
                 // Check if the data is valid and update the weather state
                 if (weatherData.main && weatherData.weather) {
