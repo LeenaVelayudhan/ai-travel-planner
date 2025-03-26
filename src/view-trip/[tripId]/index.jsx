@@ -7,6 +7,7 @@ import Hotels from '../components/Hotels';
 import InfoSection from '../components/InfoSection';
 import PlacesToVisit from '../components/PlacesToVisit';
 import Footer from '../components/Footer';
+import Chatbot from '../components/ChatBot';
 
 function Viewtrip() {
   const { tripId } = useParams();
@@ -41,6 +42,7 @@ function Viewtrip() {
       <Hotels trip={trip}/>
       <PlacesToVisit trip={trip}/>
       {/* <Footer trip={trip}/> */}
+      <Chatbot trip={trip}/>
     </div>
   )
 }
