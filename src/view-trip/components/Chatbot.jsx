@@ -19,14 +19,21 @@ const Chatbot = ({ trip }) => {
   const getBotResponse = async (userInput) => {
     try {
       setIsLoading(true);
-
-      // Send the user's message to the chat session
       const result = await chatSession.sendMessage(
         `You are a travel planner assistant. The user asked: "${userInput}". Provide a helpful response based on this and any relevant trip data: ${JSON.stringify(trip)}. Only return plain text, no JSON formatting.`
       );
-
-      // Get the plain text response
-      const botResponse = await result.response.text();
+      let botResponse = await result.response.text();
+  
+      // If the response looks like JSON, extract the text
+      try {
+        const parsed = JSON.parse(botResponse);
+        if (parsed.answer) {
+          botResponse = parsed.answer; // Extract the "answer" value
+        }
+      } catch (e) {
+        // If parsing fails, assume it’s already plain text
+      }
+  
       return botResponse.trim();
     } catch (error) {
       console.error("Error with Gemini API:", error);

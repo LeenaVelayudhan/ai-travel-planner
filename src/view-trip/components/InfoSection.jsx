@@ -45,6 +45,7 @@ function InfoSection({ trip }) {
         }
     };
 
+
     return (
         <div className="relative w-full h-auto flex flex-col items-center">
             {/* Full-Width Background Image with Weather Overlay */}
@@ -64,6 +65,7 @@ function InfoSection({ trip }) {
                         }}
                     />
                 )}
+                
                 {/* Weather Info Overlay */}
                 <div className="absolute top-4 right-4 bg-white bg-opacity-75 p-4 rounded-lg shadow-lg">
                     {weather ? (
@@ -99,6 +101,8 @@ function InfoSection({ trip }) {
                     </span>
                 </div>
             </div>
+            
+            
         </div>
     );
 }

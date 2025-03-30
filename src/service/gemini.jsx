@@ -15,7 +15,7 @@ const generationConfig = {
   topP: 0.95,
   topK: 40,
   maxOutputTokens: 8192,
-  responseMimeType: "text/plain",, // Changed to plain text for chatbot simplicity
+  responseMimeType: "text/plain", // Changed to plain text for chatbot simplicity
 };
 
 // Create a chat session (no predefined history for the chatbot)

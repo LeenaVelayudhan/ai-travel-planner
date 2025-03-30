@@ -119,6 +119,7 @@ function PlacesToVisit({ trip }) {
       setLoadingWeather(false);
     }
   };
+  const notesToDisplay = trip?.tripData?.notes || trip?.tripData?.budgetTips ||trip?.tripData?.luxuryTips || [];
 
   return (
     <div className="mt-16 p-12 rounded-3xl shadow-2xl bg-white text-black flex flex-col items-center">
@@ -173,8 +174,31 @@ function PlacesToVisit({ trip }) {
               })}
         </div>
       )}
+      {/* Notes Section */}
+{notesToDisplay.length > 0 && (
+  <div className="w-full max-w-5xl mt-12 bg-gradient-to-br from-cyan-50 to-white p-6 rounded-2xl shadow-xl border border-gray-100 transition-all duration-300">
+    <div className="flex items-center mb-5">
+      <div className="text-3xl mr-3">💡</div>
+      <h2 className="text-2xl md:text-3xl font-extrabold text-gray-800 tracking-tight">
+        Helpful Travel Tips
+      </h2>
+    </div>
+    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-inner">
+      <ul className="space-y-4">
+        {notesToDisplay.map((note, index) => (
+          <li
+            key={index}
+            className="relative pl-6 text-gray-700 text-base leading-relaxed"
+          >
+            <span className="absolute left-0 top-1 text-cyan-500 text-lg">✓</span>
+            {note}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+)}
 
-      
 
       {/* Events Section */}
       <div className="mt-16 w-full">
