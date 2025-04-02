@@ -1,8 +1,9 @@
 import { GetPlaceDetails, PHOTO_REF_URL } from '@/service/GlobalApi';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FaTrash } from 'react-icons/fa'; // Importing a trash icon from react-icons
 
-function UserTripCard({ trip }) {
+function UserTripCard({ trip, onDelete }) {
   const [photoUrl, setPhotoUrl] = useState('/placeholder.jpeg'); // Fallback image
   const [loading, setLoading] = useState(true);
 
@@ -43,29 +44,39 @@ function UserTripCard({ trip }) {
   };
 
   return (
-    <Link to={'/view-trip/' + trip?.id}>
-      <div className="hover:scale-105 transition-all hover:shadow-sm">
-        {loading ? (
-          <div className="h-[200px] w-full bg-slate-200 animate-pulse rounded-xl"></div>
-        ) : (
-          <img
-            src={photoUrl}
-            className="rounded-xl h-[200px] w-full object-cover"
-            alt={trip?.userSelection?.location}
-            onError={(e) => {
-              console.error("Image failed to load:", photoUrl);
-              e.target.src = '/placeholder.jpeg'; // Fallback if image fails to load
-            }}
-          />
-        )}
-        <div>
-          <h2 className="font-medium text-lg">{trip?.userSelection?.location}</h2>
-          <h2 className="text-sm text-gray-600">
-            {trip?.userSelection?.totalDays} Days trip with {trip?.userSelection?.budget}
-          </h2>
+    <div className="relative">
+      <Link to={'/view-trip/' + trip?.id}>
+        <div className="hover:scale-105 transition-all hover:shadow-sm">
+          {loading ? (
+            <div className="h-[200px] w-full bg-slate-200 animate-pulse rounded-xl"></div>
+          ) : (
+            <img
+              src={photoUrl}
+              className="rounded-xl h-[200px] w-full object-cover"
+              alt={trip?.userSelection?.location}
+              onError={(e) => {
+                console.error("Image failed to load:", photoUrl);
+                e.target.src = '/placeholder.jpeg'; // Fallback if image fails to load
+              }}
+            />
+          )}
+          <div>
+            <h2 className="font-medium text-lg">{trip?.userSelection?.location}</h2>
+            <h2 className="text-sm text-gray-600">
+              {trip?.userSelection?.totalDays} Days trip with {trip?.userSelection?.budget}
+            </h2>
+          </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+      {/* Delete Button */}
+      <button
+        onClick={onDelete}
+        className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+        title="Delete Trip"
+      >
+        <FaTrash size={16} />
+      </button>
+    </div>
   );
 }
 

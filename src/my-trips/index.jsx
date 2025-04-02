@@ -1,7 +1,7 @@
 import { db } from '@/service/firebaseConfig';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import UserTripCard from './components/UserTripCard';
 
 function MyTrips() {
@@ -25,13 +25,27 @@ function MyTrips() {
       const querySnapshot = await getDocs(q);
       const trips = [];
       querySnapshot.forEach((doc) => {
-        trips.push(doc.data());
+        trips.push({ id: doc.id, ...doc.data() }); // Include the document ID
       });
       setUserTrips(trips);
     } catch (error) {
       console.error("Error fetching trips:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteTrip = async (tripId) => {
+    if (!confirm("Are you sure you want to delete this trip?")) return;
+
+    try {
+      // Delete the trip from Firestore
+      await deleteDoc(doc(db, 'AITrips', tripId));
+      // Update the state to remove the trip from the UI
+      setUserTrips(userTrips.filter(trip => trip.id !== tripId));
+      console.log(`Trip ${tripId} deleted successfully`);
+    } catch (error) {
+      console.error("Error deleting trip:", error);
     }
   };
 
@@ -44,7 +58,13 @@ function MyTrips() {
             <div key={index} className="h-[200px] w-full bg-slate-200 animate-pulse rounded-xl"></div>
           ))
         ) : userTrips.length > 0 ? (
-          userTrips.map((trip, index) => <UserTripCard trip={trip} key={index} />)
+          userTrips.map((trip, index) => (
+            <UserTripCard 
+              trip={trip} 
+              key={trip.id} // Use trip.id instead of index
+              onDelete={() => deleteTrip(trip.id)} // Pass delete function
+            />
+          ))
         ) : (
           <p>No trips found.</p>
         )}
